@@ -3,6 +3,7 @@ const util = require('util');
 const glob = require('glob');
 const htmlMinifier = require('html-minifier-terser');
 const {isObject, isBoolean, deepMerge} = require('./utils');
+const async = require('async');
 
 const globAsync = util.promisify(glob);
 const readFileAsync = util.promisify(fs.readFile);
@@ -39,7 +40,7 @@ async function onPostBuild(args, pluginOptions = {}) {
   const minifyTotal = `Minify HTML files at public directory, total HTML files ${files.length}`;
   console.info(options.debug ? `${minifyTotal}:` : `${minifyTotal}.`);
 
-  const minified = files.map(async (file) => {
+  await async.eachLimit(files, 1000, async function (file) {
     const data = await readFileAsync(file, 'utf8');
     return new Promise((resolve, reject) => {
       let minify;
@@ -60,7 +61,6 @@ async function onPostBuild(args, pluginOptions = {}) {
       });
     });
   });
-  await Promise.all(minified);
 
   const minifyEnd = new Date().getTime();
   console.info(`Minify HTML files done in ${(minifyEnd - minifyStart) / 1000} sec`);

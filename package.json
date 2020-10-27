@@ -45,6 +45,7 @@
     "semi": true
   },
   "dependencies": {
+    "async": "^3.2.0",
     "glob": "^7.1.6",
     "html-minifier-terser": "^5.1.1"
   },
